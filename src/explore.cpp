@@ -349,7 +349,7 @@ namespace explore {
 }
 
 int main(int argc, char** argv){
-  ros::init(argc, argv, "zexploration");
+  ros::init(argc, argv, "explore_multirobot");
 
   explore::Explore explore;
   explore.spin();
