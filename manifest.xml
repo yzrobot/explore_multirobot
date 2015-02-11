@@ -1,0 +1,25 @@
+<package>
+  <description brief="explore_multirobot">
+    A multi-robot version for the explore package.
+  </description>
+  <author>Zhi Yan</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://www.ai.univ-paris8.fr/~yz/</url>
+  
+  <depend package="roscpp"/>
+  <depend package="std_msgs"/>
+  <depend package="costmap_2d"/>
+  <depend package="actionlib"/>
+  <depend package="move_base_msgs"/>
+  <depend package="tf"/>
+  <depend package="roslib"/>
+  <depend package="navfn"/>
+  <depend package="visualization_msgs"/>
+  <depend package="geometry_msgs"/>
+  <depend package="nav_msgs"/>
+  
+  <export>
+    <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib `rosboost-cfg --lflags thread` -lexplore"/>
+  </export>
+</package>
