@@ -51,7 +51,7 @@ MultiRobot::MultiRobot(ros::NodeHandle &nh, ros::NodeHandle &private_nh) {
   distance_traveled_ = 0;
   distance_traveled_publisher_ = private_nh.advertise<std_msgs::Float64>("distance_traveled", 1, true);
   
-  estimatedcost_publisher_ = private_nh.advertise<std_msgs::Float64>("estimatedcost", 1, true);
+  estimatedcost_publisher_ = private_nh.advertise<std_msgs::Float64>("estimated_cost", 1, true);
   
   private_nh.param("inscribed_scale", inscribed_scale_, 1.0);
 }
