@@ -47,9 +47,9 @@ MultiRobot::MultiRobot(ros::NodeHandle &nh, ros::NodeHandle &private_nh) {
   
   prev_pose_known_ = false;
   distance_traveled_ = 0;
-  actualcost_publisher_ = private_nh.advertise<std_msgs::Float64>("explore_actualcost", 1, true);
+  distance_traveled_publisher_ = private_nh.advertise<std_msgs::Float64>("distance_traveled", 1, true);
   
-  estimatedcost_publisher_ = private_nh.advertise<std_msgs::Float64>("explore_estimatedcost", 1, true);
+  estimatedcost_publisher_ = private_nh.advertise<std_msgs::Float64>("estimatedcost", 1, true);
   
   private_nh.param("inscribed_scale", inscribed_scale_, 1.0);
 }
@@ -65,23 +65,22 @@ void MultiRobot::externalMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &ms
 void MultiRobot::updateMap(costmap_2d::Costmap2DROS &costmap) {
   if(external_map_received_) {
     costmap.updateStaticMap(external_map_);
-    costmap.updateMap();
+    //costmap.updateMap(); // Just to be safe, though this should already have been done in updateStaticMap.
     external_map_received_ = false;
   }
 }
 
-void MultiRobot::actualCost(const geometry_msgs::PoseStamped &pose) {
+void MultiRobot::distanceTraveled(const geometry_msgs::PoseStamped &pose) {
   if(!prev_pose_known_) {
     prev_pose_ = pose;
     prev_pose_known_ = true;
   } else {
     double dx = prev_pose_.pose.position.x - pose.pose.position.x;
     double dy = prev_pose_.pose.position.y - pose.pose.position.y;
-    double dist = sqrt(dx*dx+dy*dy);
-    distance_traveled_ += dist;
-    std_msgs::Float64 actual_cost;
-    actual_cost.data = distance_traveled_;
-    actualcost_publisher_.publish(actual_cost);
+    distance_traveled_ += sqrt(dx*dx+dy*dy);
+    std_msgs::Float64 t;
+    t.data = distance_traveled_;
+    distance_traveled_publisher_.publish(t);
     prev_pose_ = pose;
   }
 }
@@ -89,7 +88,7 @@ void MultiRobot::actualCost(const geometry_msgs::PoseStamped &pose) {
 void MultiRobot::estimatedCost(const geometry_msgs::PoseStamped &goal, const geometry_msgs::PoseStamped &pose) {
   double dx = goal.pose.position.x - pose.pose.position.x;
   double dy = goal.pose.position.y - pose.pose.position.y;
-  std_msgs::Float64 estimated_cost;
-  estimated_cost.data = sqrt(dx*dx+dy*dy);
-  estimatedcost_publisher_.publish(estimated_cost.data);
+  std_msgs::Float64 t;
+  t.data = sqrt(dx*dx+dy*dy);
+  estimatedcost_publisher_.publish(t);
 }

@@ -66,8 +66,8 @@ namespace explore {
     bool prev_pose_known_;
     double distance_traveled_;
     geometry_msgs::PoseStamped prev_pose_;
-    ros::Publisher actualcost_publisher_;
-    void actualCost(const geometry_msgs::PoseStamped& pose);
+    ros::Publisher distance_traveled_publisher_;
+    void distanceTraveled(const geometry_msgs::PoseStamped& pose);
     
     ros::Publisher estimatedcost_publisher_;
     void estimatedCost(const geometry_msgs::PoseStamped& goal, const geometry_msgs::PoseStamped& pose);
