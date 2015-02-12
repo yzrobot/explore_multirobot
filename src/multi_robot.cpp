@@ -42,12 +42,10 @@ MultiRobot::MultiRobot(ros::NodeHandle &nh, ros::NodeHandle &private_nh) {
   tf_prefix_ = tf::getPrefixParam(private_nh);
   
   external_map_received_ = false;
-  private_nh.param("external_map_topic", external_map_topic_, std::string("map"));
-  external_map_subsriber_ = nh.subscribe(external_map_topic_, 1, &MultiRobot::externalMapCallback, this);
+  external_map_subsriber_ = nh.subscribe("map", 1, &MultiRobot::externalMapCallback, this);
   
   external_goal_received_ = false;
-  private_nh.param("external_goal_topic", external_goal_topic_, std::string("goal"));
-  external_goal_subsriber_ = nh.subscribe(external_goal_topic_, 1, &MultiRobot::externalGoalCallback, this);
+  external_goal_subsriber_ = nh.subscribe("goal", 1, &MultiRobot::externalGoalCallback, this);
   
   prev_pose_known_ = false;
   distance_traveled_ = 0;

@@ -58,14 +58,12 @@ namespace explore {
     std::string tf_prefix_;
     
     bool external_map_received_;
-    std::string external_map_topic_;
     nav_msgs::OccupancyGrid external_map_;
     ros::Subscriber external_map_subsriber_;
     void externalMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &msg);
     void updateMap(costmap_2d::Costmap2DROS &costmap);
     
     bool external_goal_received_;
-    std::string external_goal_topic_;
     move_base_msgs::MoveBaseGoal external_goal_;
     ros::Subscriber external_goal_subsriber_;
     void externalGoalCallback(const move_base_msgs::MoveBaseGoal::ConstPtr &msg);
