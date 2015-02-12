@@ -276,10 +276,12 @@ namespace explore {
       prev_plan_size_ = plan.size();
       prev_goal_ = goal_pose;
       
-      multi_robot_->estimatedCost(goal_pose, robot_pose_msg);
-      
       move_base_msgs::MoveBaseGoal goal;
       goal.target_pose = goal_pose;
+      
+      multi_robot_->updateGoal(goal); // Update the goal if we have received an external one.
+      multi_robot_->estimatedCost(goal.target_pose, robot_pose_msg);
+      
       move_base_client_.sendGoal(goal, boost::bind(&Explore::reachedGoal, this, _1, _2, goal_pose));
       
       if (visualize_) {

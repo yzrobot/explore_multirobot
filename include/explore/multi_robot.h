@@ -46,6 +46,7 @@
 #include <tf/transform_listener.h>
 #include <std_msgs/Float64.h>
 #include <costmap_2d/costmap_2d_ros.h>
+#include <move_base_msgs/MoveBaseGoal.h>
 
 namespace explore {
   class MultiRobot {
@@ -62,6 +63,13 @@ namespace explore {
     ros::Subscriber external_map_subsriber_;
     void externalMapCallback(const nav_msgs::OccupancyGrid::ConstPtr &msg);
     void updateMap(costmap_2d::Costmap2DROS &costmap);
+    
+    bool external_goal_received_;
+    std::string external_goal_topic_;
+    move_base_msgs::MoveBaseGoal external_goal_;
+    ros::Subscriber external_goal_subsriber_;
+    void externalGoalCallback(const move_base_msgs::MoveBaseGoal::ConstPtr &msg);
+    void updateGoal(move_base_msgs::MoveBaseGoal &goal);
     
     bool prev_pose_known_;
     double distance_traveled_;

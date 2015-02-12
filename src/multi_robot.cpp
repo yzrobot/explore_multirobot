@@ -45,6 +45,10 @@ MultiRobot::MultiRobot(ros::NodeHandle &nh, ros::NodeHandle &private_nh) {
   private_nh.param("external_map_topic", external_map_topic_, std::string("map"));
   external_map_subsriber_ = nh.subscribe(external_map_topic_, 1, &MultiRobot::externalMapCallback, this);
   
+  external_goal_received_ = false;
+  private_nh.param("external_goal_topic", external_goal_topic_, std::string("goal"));
+  external_goal_subsriber_ = nh.subscribe(external_goal_topic_, 1, &MultiRobot::externalGoalCallback, this);
+  
   prev_pose_known_ = false;
   distance_traveled_ = 0;
   distance_traveled_publisher_ = private_nh.advertise<std_msgs::Float64>("distance_traveled", 1, true);
@@ -67,6 +71,18 @@ void MultiRobot::updateMap(costmap_2d::Costmap2DROS &costmap) {
     costmap.updateStaticMap(external_map_);
     //costmap.updateMap(); // Just to be safe, though this should already have been done in updateStaticMap.
     external_map_received_ = false;
+  }
+}
+
+void MultiRobot::externalGoalCallback(const move_base_msgs::MoveBaseGoal::ConstPtr &msg) {
+  external_goal_ = *msg;
+  external_goal_received_ = true;
+}
+
+void MultiRobot::updateGoal(move_base_msgs::MoveBaseGoal &goal) {
+  if(external_goal_received_) {
+    goal = external_goal_;
+    external_goal_received_ = false;
   }
 }
 
