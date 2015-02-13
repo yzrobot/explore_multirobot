@@ -47,6 +47,7 @@ MultiRobot::MultiRobot(ros::NodeHandle &nh, ros::NodeHandle &private_nh) {
   external_goal_received_ = false;
   external_goal_subsriber_ = nh.subscribe("goal", 1, &MultiRobot::externalGoalCallback, this);
   
+  start_transform_known_ = false;
   prev_pose_known_ = false;
   distance_traveled_ = 0;
   distance_traveled_publisher_ = private_nh.advertise<std_msgs::Float64>("distance_traveled", 1, true);
@@ -84,11 +85,40 @@ void MultiRobot::updateGoal(move_base_msgs::MoveBaseGoal &goal) {
   }
 }
 
-void MultiRobot::distanceTraveled(const geometry_msgs::PoseStamped &pose) {
-  if(!prev_pose_known_) {
-    prev_pose_ = pose;
-    prev_pose_known_ = true;
-  } else {
+/*
+ * Two ways to track distance traveled of the robot:
+ *   1) based on odometry information,
+ *   2) or sum the Euclidean distance from each previous position.
+ */
+void MultiRobot::distanceTraveled(const geometry_msgs::PoseStamped &pose, const std::string &mode) {
+  if(mode.compare("odom") == 0) {
+    tf::StampedTransform start_transform;
+    tf::StampedTransform current_transform;
+    
+    if(!start_transform_known_) {
+      listener_.waitForTransform("base_footprint", "odom", ros::Time(0), ros::Duration(1.0));
+      listener_.lookupTransform("base_footprint", "odom", ros::Time(0), start_transform);
+      start_transform_known_ = true;
+    } else {
+      try {
+	listener_.lookupTransform("base_footprint", "odom", ros::Time(0), current_transform);
+      } catch(tf::TransformException ex) {
+	ROS_ERROR("%s", ex.what());
+	return;
+      }
+    }
+    tf::Transform relative_transform = start_transform.inverse() * current_transform;
+    distance_traveled_ = relative_transform.getOrigin().length();
+    std_msgs::Float64 t;
+    t.data = distance_traveled_;
+    distance_traveled_publisher_.publish(t);
+  }
+  
+  if(mode.compare("Euclidean") == 0) {
+    if(!prev_pose_known_) {
+      prev_pose_ = pose;
+      prev_pose_known_ = true;
+    } else {
     double dx = prev_pose_.pose.position.x - pose.pose.position.x;
     double dy = prev_pose_.pose.position.y - pose.pose.position.y;
     distance_traveled_ += sqrt(dx*dx+dy*dy);
@@ -96,6 +126,7 @@ void MultiRobot::distanceTraveled(const geometry_msgs::PoseStamped &pose) {
     t.data = distance_traveled_;
     distance_traveled_publisher_.publish(t);
     prev_pose_ = pose;
+    }
   }
 }
 

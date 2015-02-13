@@ -294,7 +294,7 @@ namespace explore {
       done_exploring_ = true;
     }
     
-    multi_robot_->distanceTraveled(robot_pose_msg);
+    multi_robot_->distanceTraveled(robot_pose_msg, "Euclidean");
   }
   
   bool Explore::goalOnBlacklist(const geometry_msgs::PoseStamped& goal){
